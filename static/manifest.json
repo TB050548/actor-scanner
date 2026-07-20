@@ -2,7 +2,7 @@
     "name": "Find the Actor",
     "short_name": "Find the Actor",
     "description": "Identify actors instantly using facial recognition",
-    "start_url": "actor-scanner-production.up.railway.app",
+    "start_url": "https://actor-scanner-production.up.railway.app/",
     "display": "standalone",
     "background_color": "#0d0d1a",
     "theme_color": "#6c4ecb",
