@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen loading-screen">
+            <div class="actor-avatar">
+                👤
+                <div class="loading-ring"></div>
+            </div>
+
+            <p class="loading-title">Identifying actor...</p>
+            <p class="loading-subtitle">Searching film database</p>
+
+            <div class="loading-progress">
+                <div class="loading-bar"></div>
+            </div>
+
+            <ul class="loading-steps">
+                <li class="done" id="step1">Face detected</li>
+                <li class="done" id="step2">Feature extraction complete</li>
+                <li id="step3">Matching against database...</li>
+            </ul>
+
+            <button class="secondary-btn" style="margin-top:32px;" onclick="goHome()">Cancel</button>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Auto-redirect to result after simulated processing delay
+        setTimeout(function() {
+            window.location.href = "/process";
+        }, 2500);
+    </script>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service_worker.js");
+    }
+    </script>
+</body>
+</html> 

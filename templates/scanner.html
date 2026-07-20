@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Actor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen scanner-screen">
+            <div class="scanner-topbar">
+                <button class="back-btn" onclick="goHome()">←</button>
+                <h2>Scan Actor</h2>
+                <div class="flash-icon">⚡</div>
+            </div>
+
+            <p class="scanner-instruction">Position face in the frame</p>
+
+            <div class="camera-preview">
+                <div class="scan-frame">
+                    <div class="scan-corner top-left"></div>
+                    <div class="scan-corner top-right"></div>
+                    <div class="scan-corner bottom-left"></div>
+                    <div class="scan-corner bottom-right"></div>
+                    <div class="scan-line"></div>
+                </div>
+            </div>
+
+            <p class="scanner-status">Detecting...</p>
+
+            <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <label for="imageInput" class="primary-btn" style="display:block; text-align:center; cursor:pointer;">
+                    Open Camera
+                </label>
+                <input type="file" name="image" id="imageInput"
+                       accept="image/*" capture="environment" hidden>
+            </form>
+
+            <p class="scanner-help">Ensure good lighting</p>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const input = document.getElementById("imageInput");
+            const form = document.getElementById("uploadForm");
+            if (input && form) {
+                input.addEventListener("change", function () {
+                    if (input.files.length > 0) {
+                        form.submit();
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service_worker.js");
+    }
+    </script>
+</body>
+</html>

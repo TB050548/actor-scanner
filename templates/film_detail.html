@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ film.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen result-screen">
+
+            <div class="scanner-topbar">
+                <button class="back-btn" onclick="history.back()">← Back</button>
+                <h2 style="font-size:14px; color:white;">{{ film.title }}</h2>
+            </div>
+
+            <!-- Actor image instead of blank film still -->
+            <div style="width:100%; display:flex; justify-content:center; margin:16px 0;">
+                <img src="{{ url_for('actor_image', filename=actor_image) }}"
+                     alt="{{ actor_name }}"
+                     style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #6c4ecb;">
+            </div>
+
+            <p class="actor-name" style="text-align:center;">{{ film.title }}</p>
+            <p class="actor-bio" style="text-align:center;">{{ film.genre }} · {{ film.year }}</p>
+
+            <div class="film-card" style="margin-top:16px;">
+                <div>
+                    <p class="film-meta">Actor</p>
+                    <p class="film-title">{{ actor_name }}</p>
+                </div>
+            </div>
+
+            <div class="film-card">
+                <div>
+                    <p class="film-meta">Role</p>
+                    <p class="film-title">{{ film.role }}</p>
+                </div>
+            </div>
+
+            <div class="film-card">
+                <div>
+                    <p class="film-meta">Genre</p>
+                    <p class="film-title">{{ film.genre }}</p>
+                </div>
+            </div>
+
+            <div class="film-card">
+                <div>
+                    <p class="film-meta">Year</p>
+                    <p class="film-title">{{ film.year }}</p>
+                </div>
+            </div>
+
+            <a href="https://www.imdb.com/find?q={{ film.title }}" target="_blank" class="imdb-btn" style="margin-top:16px;">
+                Full detail on IMDb ›
+            </a>
+
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service_worker.js");
+        }
+    </script>
+</body>
+</html>

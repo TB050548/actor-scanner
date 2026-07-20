@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Actor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen search-screen" style="padding:0; overflow-y:auto;">
+
+            <!-- Hero header -->
+            <div class="search-hero">
+                <button class="back-btn" onclick="goHome()" style="position:absolute; top:20px; left:20px;">←</button>
+                <div class="search-hero-content">
+                    <h1 class="search-hero-title">Find Any<br><span class="search-gradient">Actor</span></h1>
+                </div>
+                <div class="hero-circle circle-1"></div>
+                <div class="hero-circle circle-2"></div>
+                <div class="hero-circle circle-3"></div>
+            </div>
+
+            <div style="padding: 0 20px 100px;">
+
+                <!-- Search bar -->
+                <div class="search-bar-wrapper" style="margin-top:-24px; position:relative; z-index:10;">
+                    <div class="search-bar-inner">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="searchInput"
+                               placeholder="Search by name..." autocomplete="off">
+                        <button class="search-clear" id="clearBtn" onclick="clearSearch()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Suggestions list -->
+                <ul class="suggestions-list" id="suggestionsList"></ul>
+
+                <!-- Recent searches — always visible -->
+                <div id="recentSection">
+                    <p class="section-label" style="margin-top:24px; font-size:14px;">🕐 Recent Searches</p>
+                    <div id="recentSearches"></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        const input = document.getElementById("searchInput");
+        const list = document.getElementById("suggestionsList");
+        const recentSection = document.getElementById("recentSection");
+
+        input.addEventListener("input", function () {
+            const query = input.value.trim();
+            if (query.length < 1) {
+                list.innerHTML = "";
+                recentSection.style.display = "block";
+                return;
+            }
+            recentSection.style.display = "none";
+            triggerSearch(query);
+        });
+
+        function triggerSearch(query) {
+            fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    list.innerHTML = "";
+                    if (data.length === 0) {
+                        list.innerHTML = `
+                            <li style="list-style:none;">
+                                <div style="text-align:center; padding:24px 16px; background:#1a1a2e;
+                                            border-radius:12px; margin-top:12px;">
+                                    <div style="font-size:36px; margin-bottom:12px;">🔍</div>
+                                    <p style="color:white; font-size:16px; font-weight:700; margin-bottom:8px;">
+                                        No results found</p>
+                                    <p style="color:#8888aa; font-size:13px; line-height:1.5;">
+                                        We couldn't find "${query}" in our database.<br>
+                                        Try scanning their photo instead.</p>
+                                    <button onclick="goToScanner()" style="margin-top:16px; background:#6c4ecb;
+                                            color:white; border:none; border-radius:10px; padding:10px 24px;
+                                            font-size:14px; cursor:pointer;">
+                                        Scan Actor
+                                    </button>
+                                </div>
+                            </li>`;
+                        return;
+                    }
+                    data.forEach((actor, index) => {
+                        const li = document.createElement("li");
+                        li.className = "suggestion-item";
+                        li.style.animationDelay = `${index * 0.05}s`;
+                        li.style.animation = "pageFadeIn 0.3s ease forwards";
+                        li.style.opacity = "0";
+                        li.innerHTML = `
+                            <div class="suggestion-avatar">${actor.name.slice(0,2).toUpperCase()}</div>
+                            <div style="flex:1;">
+                                <p class="suggestion-name">${highlightMatch(actor.name, query)}</p>
+                                <p class="suggestion-meta">Actor · Tap to view profile</p>
+                            </div>
+                            <span style="color:#6c4ecb; font-size:18px;">›</span>`;
+                        li.addEventListener("click", () => {
+                            saveRecent(actor.id, actor.name);
+                            window.location.href = "/actor/" + actor.id;
+                        });
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function highlightMatch(name, query) {
+            const index = name.toLowerCase().indexOf(query.toLowerCase());
+            if (index === -1) return name;
+            return name.slice(0, index) +
+                `<span style="color:#a855f7; font-weight:700;">${name.slice(index, index + query.length)}</span>` +
+                name.slice(index + query.length);
+        }
+
+        function clearSearch() {
+            input.value = "";
+            list.innerHTML = "";
+            recentSection.style.display = "block";
+        }
+
+        function saveRecent(id, name) {
+            let recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+            recent = recent.filter(item => item && item.id && item.name && item.name !== name);
+            recent = [{id: id, name: name}, ...recent].slice(0, 5);
+            localStorage.setItem("recentSearches", JSON.stringify(recent));
+        }
+
+        function loadRecent() {
+            const container = document.getElementById("recentSearches");
+            let recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+            recent = recent.filter(item => item && item.id && item.name);
+
+            if (recent.length === 0) {
+                container.innerHTML = `<p style="color:#6666aa; font-size:13px; padding:8px 0;">
+                    No recent searches yet</p>`;
+                return;
+            }
+
+            container.innerHTML = "";
+            recent.forEach((item) => {
+                const div = document.createElement("div");
+                div.className = "recent-item";
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:32px; height:32px; border-radius:50%; background:#1e1e3a;
+                             display:flex; align-items:center; justify-content:center;
+                             color:#6c4ecb; font-size:14px;">◎</div>
+                        <span class="recent-name" style="cursor:pointer;">${item.name}</span>
+                    </div>
+                    <button class="recent-clear">✕</button>`;
+
+                div.querySelector(".recent-name").addEventListener("click", () => {
+                    window.location.href = "/actor/" + item.id;
+                });
+
+                div.querySelector(".recent-clear").addEventListener("click", () => {
+                    removeRecent(item.name);
+                });
+
+                container.appendChild(div);
+            });
+        }
+
+        function removeRecent(name) {
+            let recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+            recent = recent.filter(item => item && item.name !== name);
+            localStorage.setItem("recentSearches", JSON.stringify(recent));
+            loadRecent();
+        }
+
+        loadRecent();
+    </script>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service_worker.js");
+    }
+    </script>
+</body>
+</html> 

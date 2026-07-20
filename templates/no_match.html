@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Match</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen no-match-screen">
+            <div class="no-match-icon">🔍</div>
+            <p class="no-match-title">No match found</p>
+            <p class="no-match-desc">
+                We couldn't identify this actor. This could be due to poor lighting,
+                an obscured face, or an actor not in our current database.
+            </p>
+
+            <div class="tips-box">
+                <p>Try in better lighting</p>
+                <p>Ensure face is unobscured</p>
+            </div>
+
+            <button class="try-again-btn" onclick="goToScanner()">Try Again</button>
+            <button class="search-instead" onclick="goToSearch()">Search by name instead →</button>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service_worker.js");
+    }
+    </script>
+</body>
+</html> 

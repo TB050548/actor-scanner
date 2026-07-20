@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actor Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen result-screen">
+
+            <!-- Actor header with real photo -->
+            <div class="result-header">
+                <div class="result-avatar">
+                    <img src="{{ url_for('actor_image', filename=actor_image) }}"
+                         alt="{{ actor_name }}"
+                         style="width:72px; height:72px; border-radius:50%; object-fit:cover;">
+                    <span class="confidence-badge">{{ confidence }}%</span>
+                </div>
+                <div>
+                    <p class="actor-name">{{ actor_name }}</p>
+                    <p class="actor-bio">{{ actor_nationality }}</p>
+                    <p class="actor-bio">Born {{ actor_dob }}</p>
+                </div>
+            </div>
+
+            <!-- Tabs — only All and Movies are functional -->
+            <div class="tab-bar">
+                <div class="tab active" onclick="showTab('all')">All</div>
+                <div class="tab" onclick="showTab('movies')">Movies</div>
+                <div class="tab" onclick="showTab('series')">Series</div>
+            </div>
+
+            <!-- Film list -->
+            <div id="tab-all">
+                {% for film in films %}
+                <a href="/film/{{ loop.index0 }}" style="width:100%; text-decoration:none;">
+                    <div class="film-card">
+                        <div>
+                            <p class="film-title">{{ film.title }}</p>
+                            <p class="film-meta">{{ film.genre }} · {{ film.role }}</p>
+                        </div>
+                        <p class="film-year">{{ film.year }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div id="tab-movies" style="display:none;">
+                {% for film in films %}
+                <a href="/film/{{ loop.index0 }}" style="width:100%; text-decoration:none;">
+                    <div class="film-card" style="--card-index: {{ loop.index0 }}">
+                        <div>
+                            <p class="film-title">{{ film.title }}</p>
+                            <p class="film-meta">{{ film.genre }} · {{ film.role }}</p>
+                        </div>
+                        <p class="film-year">{{ film.year }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div id="tab-series" style="display:none;">
+                {% for film in films %}
+                {% if film.genre == 'Drama Series' or film.genre == 'Crime Series' %}
+                <a href="/film/{{ loop.index0 }}" style="width:100%; text-decoration:none;">
+                    <div class="film-card">
+                        <div>
+                            <p class="film-title">{{ film.title }}</p>
+                            <p class="film-meta">{{ film.genre }} · {{ film.role }}</p>
+                        </div>
+                        <p class="film-year">{{ film.year }}</p>
+                    </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <a href="https://www.imdb.com/find?q={{ actor_name }}" target="_blank" class="imdb-btn">
+                Full detail on IMDb ›
+            </a>
+            <button onclick="goHome()" style="width:100%; padding:14px; background:transparent;
+                color:#6c4ecb; border:2px solid #6c4ecb; border-radius:12px;
+                font-size:15px; font-weight:600; cursor:pointer; margin-top:12px;">
+                ← Back to Home
+            </button>
+        </main>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            // Hide all tabs
+            document.getElementById('tab-all').style.display = 'none';
+            document.getElementById('tab-movies').style.display = 'none';
+            document.getElementById('tab-series').style.display = 'none';
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById('tab-' + tab).style.display = 'block';
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+    <script>
+        // Confidence badge counts up to the real value
+        const badge = document.querySelector(".confidence-badge");
+        if (badge) {
+            const target = parseFloat(badge.textContent);
+            if (!isNaN(target)) {
+                let current = 0;
+                const step = target / 40;
+                const interval = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(interval);
+                    }
+                    badge.textContent = current.toFixed(1) + "%";
+                }, 30);
+            }
+        }
+    </script>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service_worker.js");
+    }
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

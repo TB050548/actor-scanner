@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Actor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c4ecb">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Find the Actor">
+</head>
+<body>
+    <div class="phone">
+        <main class="screen home-screen">
+            <h1 class="app-title">Find the Actor</h1>
+            <p class="app-subtitle">Actor Recognition</p>
+
+            <div class="camera-icon-wrapper">
+                <div class="camera-icon">&#128247;</div>
+            </div>
+
+            <button class="primary-btn" onclick="goToScanner()">Scan Actor</button>
+            <button class="secondary-btn" onclick="goToSearch()">Search by Name</button>
+
+            <nav class="bottom-nav">
+                <span onclick="goHome()">Home</span>
+                <span onclick="goToScanner()">Scan</span>
+                <span onclick="goToSearch()">Search</span>
+            </nav>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service_worker.js");
+    }
+    </script>
+</body>
+</html>  
+
+
+
