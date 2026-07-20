@@ -6,3 +6,14 @@ cmds = ["pip install -r requirements.txt"]
 
 [start]
 cmd = "python app.py"
+[variables]
+MISE_PYTHON_GITHUB_ATTESTATIONS = "false"
+
+[phases.setup]
+nixPkgs = ["libX11", "libGL", "cmake", "gcc"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "python app.py"
