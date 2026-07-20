@@ -1,13 +1,18 @@
 FROM python:3.10-slim
 
-# Install system dependencies including libX11
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     libx11-6 \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
     cmake \
     gcc \
     g++ \
+    build-essential \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
